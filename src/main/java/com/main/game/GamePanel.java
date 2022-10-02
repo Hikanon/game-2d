@@ -1,22 +1,23 @@
 package com.main.game;
 
+import com.main.game.entity.Player;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    static final int ORIGINAL_TILE_SIZE = 16; //16x16
-    static final int SCALE = 3;
-    static final int TILE_SIZE = ORIGINAL_TILE_SIZE * SCALE; //48x48
-    static final int MAX_SCREEN_COLUMN = 16;
-    static final int MAX_SCREEN_ROWS = 9;
-    static final int SCREEN_WIDTH = TILE_SIZE * MAX_SCREEN_COLUMN;
-    static final int SCREEN_HEIGHT = TILE_SIZE * MAX_SCREEN_ROWS;
+    public static final int ORIGINAL_TILE_SIZE = 16; //16x16
+    public static final int SCALE = 3;
+    public static final int TILE_SIZE = ORIGINAL_TILE_SIZE * SCALE; //48x48
+    public static final int MAX_SCREEN_COLUMN = 16;
+    public static final int MAX_SCREEN_ROWS = 9;
+    public static final int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;//TILE_SIZE * MAX_SCREEN_COLUMN;
+    public static final int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;//TILE_SIZE * MAX_SCREEN_ROWS;
     static final int FPS = 60;
     Thread gameThread;
     KeyHandler keyHandler = new KeyHandler();
-
-    Player player = new Player(new Point(100, 100), 2, new HitBox(100, 100));
+    Player player = new Player(new Point(100, 100), 2, new HitBox(TILE_SIZE, TILE_SIZE), this, keyHandler);
 
     public GamePanel() {
         setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -62,15 +63,22 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update(){
-        player.move(keyHandler.getPlayerOffset());
+        player.update();
 
     }
 
     public void paintComponent(Graphics graphics){
         super.paintComponent(graphics);
         Graphics2D graphics2D = (Graphics2D) graphics;
-        graphics2D.setColor(Color.WHITE);
-        graphics2D.fillRect((int) player.getPosition().getX(), (int) player.getPosition().getY(), player.getHitBox().getWidth(), player.getHitBox().getHeight());
+        player.draw(graphics2D);
         graphics2D.dispose();
+    }
+
+    public static int getScreenWidth(){
+        return SCREEN_WIDTH;
+    }
+
+    public static int getScreenHeight(){
+        return SCREEN_HEIGHT;
     }
 }
