@@ -2,24 +2,22 @@ package com.main.game;
 
 import com.main.game.entity.Player;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.util.Objects;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    public static final int ORIGINAL_TILE_SIZE = 16; //16x16
-    public static final int SCALE = 3;
-    public static final int TILE_SIZE = ORIGINAL_TILE_SIZE * SCALE; //48x48
-    public static final int MAX_SCREEN_COLUMN = 16;
-    public static final int MAX_SCREEN_ROWS = 9;
     public static final int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;//TILE_SIZE * MAX_SCREEN_COLUMN;
     public static final int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;//TILE_SIZE * MAX_SCREEN_ROWS;
     static final int FPS = 60;
     Thread gameThread;
     KeyHandler keyHandler = new KeyHandler();
-    Player player = new Player(new Point(100, 100), 2, new HitBox(TILE_SIZE, TILE_SIZE), this, keyHandler);
+    Player player = new Player(new Point(100, 100), 2, new Sprite(ImageIO.read(Objects.requireNonNull(getClass().getResource("/sprites/player/help.png"))), 48, 48), keyHandler);
 
-    public GamePanel() {
+    public GamePanel() throws IOException {
         setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         setBackground(Color.BLACK);
         setDoubleBuffered(true);
