@@ -10,12 +10,12 @@ import java.util.Objects;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    public static final int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;//TILE_SIZE * MAX_SCREEN_COLUMN;
-    public static final int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;//TILE_SIZE * MAX_SCREEN_ROWS;
+    public static final int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
+    public static final int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
     static final int FPS = 60;
     Thread gameThread;
     KeyHandler keyHandler = new KeyHandler();
-    Player player = new Player(new Point(100, 100), 2, new Sprite(ImageIO.read(Objects.requireNonNull(getClass().getResource("/sprites/player/help.png"))), 48, 48), keyHandler);
+    Player player = new Player(new Point(100, 100), 2, new Sprite(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/player/help.png"))), 48, 48), keyHandler);
 
     public GamePanel() throws IOException {
         setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -29,6 +29,7 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread = new Thread(this);
         gameThread.start();
     }
+
 //TODO Сделать нормальное ограничение фпс или одтелить привязку обновления от фпс
     @Override
     public void run() {
@@ -62,7 +63,6 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update(){
         player.update();
-
     }
 
     public void paintComponent(Graphics graphics){

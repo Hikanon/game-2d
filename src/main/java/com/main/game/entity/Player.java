@@ -8,20 +8,20 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 //TODO Сделать что бы по человечески не уходило за граници. Сейчас полностью не доходит до угла и остаётся пару пикселей до края
-
-//TODO Написать хоть какую-нибудь анимацию
 public class Player extends Entity{
 
     KeyHandler keyHandler;
 
     Point[] startAnimPoints;
     Direction oldDirection = Direction.DOWN;
+    int animCount = 0;
+    int spriteCount = 0;
 
     public Player(Point position, int speed, Sprite sprite,KeyHandler keyHandler) {
         super(position, speed, sprite);
 
         this.keyHandler = keyHandler;
-        startAnimPoints = new Point[]{new Point(3, 21), new Point(3, 3), new Point(3, 38), new Point(3, 56)};
+        startAnimPoints = new Point[]{new Point(2, 2), new Point(2, 20), new Point(2, 38), new Point(2, 56)};
     }
     /**
      * offsets[0] = -1, если идем вверх
@@ -31,7 +31,6 @@ public class Player extends Entity{
      * */
     @Override
     public void move(byte[] offsets){
-
 
         int newPositionY = this.getPosition().y + (offsets[0] + offsets[1]) * this.getSpeed();
         int newPositionX = this.getPosition().x + (offsets[2] + offsets[3]) * this.getSpeed();
@@ -62,30 +61,40 @@ public class Player extends Entity{
         this.move(keyHandler.getPlayerOffset());
     }
 
-    int animCount = 0;
+    //TODO Написать хоть какую-нибудь анимацию и отделить обновления от частоты прогона цикла
+
     public void draw(Graphics2D graphics2D){
+
         BufferedImage image = null;
         switch (direction) {
             case UP -> {
                 if(oldDirection == direction && keyHandler.getPlayerOffset()[0] == -1){
-                    image = sprites.getSprites().getSubimage((startAnimPoints[0].x + (16* animCount)) + (2 * animCount ), startAnimPoints[0].y, 16, 16);
-                    animCount++;
+                    image = sprites.getSprites().getSubimage((startAnimPoints[0].x + (16* animCount)) + (2 * animCount), startAnimPoints[0].y, 16, 16);
                 }else image = sprites.getSprites().getSubimage(startAnimPoints[0].x, startAnimPoints[0].y, 16, 16);
             }
             case DOWN -> {
                 if(oldDirection == direction && keyHandler.getPlayerOffset()[1] == 1){
                     image = sprites.getSprites().getSubimage((startAnimPoints[1].x + (16 * animCount)) + (2 *animCount), startAnimPoints[1].y, 16, 16);
-                    animCount++;
                 }else image = sprites.getSprites().getSubimage(startAnimPoints[1].x, startAnimPoints[1].y, 16, 16);
             }
-            case LEFT ->
-                image = sprites.getSprites().getSubimage(3, 38, 16, 16);
+            case LEFT -> {
+                if (oldDirection == direction && keyHandler.getPlayerOffset()[2] == 1) {
+                    image = sprites.getSprites().getSubimage((startAnimPoints[2].x + (16 * animCount)) + (2 * animCount), startAnimPoints[2].y, 16, 16);
+                } else image = sprites.getSprites().getSubimage(startAnimPoints[2].x, startAnimPoints[2].y, 16, 16);
+            }
 
-            case RIGHT ->
-                image = sprites.getSprites().getSubimage(3, 56, 16, 16);
-
+            case RIGHT ->{
+                if(oldDirection == direction && keyHandler.getPlayerOffset()[3] == 1) {
+                    image = sprites.getSprites().getSubimage((startAnimPoints[3].x + (16 * animCount)) + (2 * animCount), startAnimPoints[3].y, 16, 16);
+                }else image = sprites.getSprites().getSubimage(startAnimPoints[3].x, startAnimPoints[3].y, 16, 16);
+            }
         }
-        if (animCount > 4) animCount = 1;
+        spriteCount++;
+        if(spriteCount == 10){
+            animCount++;
+            spriteCount = 0;
+        }
+        if (animCount > 3) animCount = 2;
         oldDirection = direction;
         graphics2D.drawImage(image, position.x, position.y, sprites.getTileSizeW(),sprites.getTileSizeH(), null);
     }
