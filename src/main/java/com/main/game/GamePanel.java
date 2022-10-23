@@ -12,7 +12,10 @@ public class GamePanel extends JPanel implements Runnable {
 
     public static final int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
     public static final int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-    static final int FPS = 60;
+    double interpolation = 0;
+    final int TICKS_PER_SECOND = 60;
+    final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+    final int MAX_FRAMESKIP = 5;
     Thread gameThread;
     KeyHandler keyHandler = new KeyHandler();
     Player player = new Player(new Point(100, 100), 2, new Sprite(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/player/help.png"))), 48, 48), keyHandler);
@@ -30,34 +33,24 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread.start();
     }
 
-//TODO Сделать нормальное ограничение фпс или одтелить привязку обновления от фпс
     @Override
     public void run() {
 
-        double drawInterval = 1000000000.0/FPS;
-        double delta = 0;
-        long lastTime = System.nanoTime();
-        long currentTime;
-        long timer = 0;
-        int drawCount = 0;
+
+        double nextGameTick = System.currentTimeMillis();
+        int loops;
 
         while (gameThread != null){
-            currentTime = System.nanoTime();
-            delta += (currentTime - lastTime)/drawInterval;
-            timer += currentTime - lastTime;
-            lastTime = currentTime;
-            if(delta >= 1){
+            loops = 0;
+            while (System.currentTimeMillis() > nextGameTick
+                    && loops < MAX_FRAMESKIP){
                 update();
-                repaint();
-                delta--;
-                drawCount++;
-            }
 
-            if(timer >= 1000000000){
-                System.out.println("FPS " + drawCount);
-                drawCount = 0;
-                timer = 0;
+                nextGameTick +=SKIP_TICKS;
+                loops++;
             }
+            interpolation = ((System.currentTimeMillis() + SKIP_TICKS - nextGameTick)/ (double) SKIP_TICKS);
+            repaint();
         }
     }
 

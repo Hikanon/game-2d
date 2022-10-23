@@ -26,6 +26,7 @@ public class KeyHandler implements KeyListener{
                 case VK_S, VK_DOWN -> playerOffset[1] = 1;
                 case VK_A, VK_LEFT -> playerOffset[2] = -1;
                 case VK_D, VK_RIGHT -> playerOffset[3] = 1;
+                case VK_ESCAPE -> System.exit(0);
             }
         }
     }

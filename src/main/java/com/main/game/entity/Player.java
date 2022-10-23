@@ -14,6 +14,7 @@ public class Player extends Entity{
 
     Point[] startAnimPoints;
     Direction oldDirection = Direction.DOWN;
+    BufferedImage drawingSprite;
     int animCount = 0;
     int spriteCount = 0;
 
@@ -32,8 +33,8 @@ public class Player extends Entity{
     @Override
     public void move(byte[] offsets){
 
-        int newPositionY = this.getPosition().y + (offsets[0] + offsets[1]) * this.getSpeed();
-        int newPositionX = this.getPosition().x + (offsets[2] + offsets[3]) * this.getSpeed();
+        int newPositionY = (int) (this.getPosition().getY()) + (offsets[0] + offsets[1]) * this.getSpeed();
+        int newPositionX = (int) (this.getPosition().getX()) + (offsets[2] + offsets[3]) * this.getSpeed();
 
         if(offsets[0] == -1) {
             direction = Direction.UP;
@@ -52,19 +53,9 @@ public class Player extends Entity{
            this.getPosition().y += (offsets[0] + offsets[1]) * this.getSpeed();
         }
        oldDirection = direction;
-
     }
 
-
-
-    public void update(){
-        this.move(keyHandler.getPlayerOffset());
-    }
-
-    //TODO Написать хоть какую-нибудь анимацию и отделить обновления от частоты прогона цикла
-
-    public void draw(Graphics2D graphics2D){
-
+    void chooseSprite(){
         BufferedImage image = null;
         switch (direction) {
             case UP -> {
@@ -90,13 +81,25 @@ public class Player extends Entity{
             }
         }
         spriteCount++;
-        if(spriteCount == 10){
+        if(spriteCount == 12){
             animCount++;
             spriteCount = 0;
         }
         if (animCount > 3) animCount = 2;
         oldDirection = direction;
-        graphics2D.drawImage(image, position.x, position.y, sprites.getTileSizeW(),sprites.getTileSizeH(), null);
+        drawingSprite = image;
+    }
+
+
+
+    public void update(){
+        this.move(keyHandler.getPlayerOffset());
+        this.chooseSprite();
+    }
+
+    public void draw(Graphics2D graphics2D){
+
+        graphics2D.drawImage(drawingSprite, position.x, position.y, sprites.getTileSizeW(),sprites.getTileSizeH(), null);
     }
 
 }
