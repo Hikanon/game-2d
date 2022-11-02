@@ -2,25 +2,23 @@ package com.main.game;
 
 import com.main.game.entity.Player;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.util.Objects;
 
 public class GamePanel extends JPanel implements Runnable {
 
+
     public static final int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
     public static final int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-    double interpolation = 0;
-    final int TICKS_PER_SECOND = 60;
-    final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-    final int MAX_FRAMESKIP = 5;
-    Thread gameThread;
-    KeyHandler keyHandler = new KeyHandler();
-    Player player = new Player(new Point(100, 100), 2, new Sprite(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/player/help.png"))), 48, 48), keyHandler);
+    private Thread gameThread;
+    private final KeyHandler keyHandler = new KeyHandler();
+    private final Player player = new Player(new Point(400, 400), 2, keyHandler);
+
+    private final MapManager mapManager;
 
     public GamePanel() throws IOException {
+        mapManager = new MapManager();
         setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         setBackground(Color.BLACK);
         setDoubleBuffered(true);
@@ -35,21 +33,20 @@ public class GamePanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-
-
         double nextGameTick = System.currentTimeMillis();
         int loops;
-
         while (gameThread != null){
             loops = 0;
+            int TICKS_PER_SECOND = 60;
+            int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+            int MAX_FRAME_SKIP = 5;
             while (System.currentTimeMillis() > nextGameTick
-                    && loops < MAX_FRAMESKIP){
+                    && loops < MAX_FRAME_SKIP){
                 update();
 
-                nextGameTick +=SKIP_TICKS;
+                nextGameTick += SKIP_TICKS;
                 loops++;
             }
-            interpolation = ((System.currentTimeMillis() + SKIP_TICKS - nextGameTick)/ (double) SKIP_TICKS);
             repaint();
         }
     }
@@ -61,6 +58,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void paintComponent(Graphics graphics){
         super.paintComponent(graphics);
         Graphics2D graphics2D = (Graphics2D) graphics;
+        mapManager.draw(graphics2D);
         player.draw(graphics2D);
         graphics2D.dispose();
     }

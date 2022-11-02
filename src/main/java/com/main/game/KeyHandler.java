@@ -11,7 +11,7 @@ public class KeyHandler implements KeyListener{
 
     private final Set<Integer> pressedKeys = new HashSet<>();
 
-    byte[] playerOffset = new byte[4];
+    byte[] playerOffset = new byte[5];
 
     @Override
     public void keyTyped(KeyEvent e) {}
@@ -26,6 +26,7 @@ public class KeyHandler implements KeyListener{
                 case VK_S, VK_DOWN -> playerOffset[1] = 1;
                 case VK_A, VK_LEFT -> playerOffset[2] = -1;
                 case VK_D, VK_RIGHT -> playerOffset[3] = 1;
+                case VK_SHIFT -> playerOffset[4] = 1;
                 case VK_ESCAPE -> System.exit(0);
             }
         }
@@ -40,6 +41,7 @@ public class KeyHandler implements KeyListener{
             case VK_S, VK_DOWN -> playerOffset[1] = 0;
             case VK_A, VK_LEFT -> playerOffset[2] = 0;
             case VK_D, VK_RIGHT -> playerOffset[3] = 0;
+            case VK_SHIFT -> playerOffset[4] = 1;
         }
     }
 

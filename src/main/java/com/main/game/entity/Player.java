@@ -4,10 +4,17 @@ import com.main.game.GamePanel;
 import com.main.game.KeyHandler;
 import com.main.game.Sprite;
 import com.main.game.enums.Direction;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Objects;
 
-//TODO Сделать что бы по человечески не уходило за граници. Сейчас полностью не доходит до угла и остаётся пару пикселей до края
+@Getter
+@Setter
 public class Player extends Entity{
 
     KeyHandler keyHandler;
@@ -16,22 +23,31 @@ public class Player extends Entity{
     Direction oldDirection = Direction.DOWN;
     BufferedImage drawingSprite;
     int animCount = 0;
+    int runningSpeed;
+    int defaultSpeed;
     int spriteCount = 0;
 
-    public Player(Point position, int speed, Sprite sprite,KeyHandler keyHandler) {
-        super(position, speed, sprite);
-
+    public Player(Point position, int speed, KeyHandler keyHandler) throws IOException {
+        super(position, speed);
+        runningSpeed = speed *2;
+        defaultSpeed = speed;
         this.keyHandler = keyHandler;
-        startAnimPoints = new Point[]{new Point(2, 2), new Point(2, 20), new Point(2, 38), new Point(2, 56)};
+        this.sprites =  new Sprite(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/playerSprites/player.png"))), 48,48);
+        startAnimPoints = new Point[]{new Point(2, 20), new Point(2, 2), new Point(2, 38), new Point(2, 56)};
     }
+
     /**
      * offsets[0] = -1, если идем вверх
      * offsets[1] = 1, если идем вниз
      * offsets[2] = -1, если идем влево
      * offsets[3] = 1, если идем вправо
+     * offsets[4] = 1, SHIFT
      * */
     @Override
     public void move(byte[] offsets){
+        if(offsets[4] == 1){
+            this.speed = runningSpeed;
+        }else this.speed = defaultSpeed;
 
         int newPositionY = (int) (this.getPosition().getY()) + (offsets[0] + offsets[1]) * this.getSpeed();
         int newPositionX = (int) (this.getPosition().getX()) + (offsets[2] + offsets[3]) * this.getSpeed();
@@ -89,8 +105,6 @@ public class Player extends Entity{
         oldDirection = direction;
         drawingSprite = image;
     }
-
-
 
     public void update(){
         this.move(keyHandler.getPlayerOffset());
