@@ -1,9 +1,9 @@
 package com.main.game.entity;
 
+import com.main.engine.KeyHandler;
+import com.main.engine.Sprite;
 import com.main.game.GamePanel;
-import com.main.game.KeyHandler;
-import com.main.game.Sprite;
-import com.main.game.enums.Direction;
+import com.main.engine.enums.Direction;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,23 +17,27 @@ import java.util.Objects;
 @Setter
 public class Player extends Entity{
 
-    KeyHandler keyHandler;
+    private final KeyHandler keyHandler;
+    private final Point[] startAnimPoints;
+    private int animCount = 0;
+    private int spriteCount = 0;
+    private final int runningSpeed;
+    private final int defaultSpeed;
+    private final GamePanel gamePanel;
+    private BufferedImage drawingSprite;
+    private Direction oldDirection = Direction.DOWN;
 
-    Point[] startAnimPoints;
-    Direction oldDirection = Direction.DOWN;
-    BufferedImage drawingSprite;
-    int animCount = 0;
-    int runningSpeed;
-    int defaultSpeed;
-    int spriteCount = 0;
-
-    public Player(Point position, int speed, KeyHandler keyHandler) throws IOException {
+    public Player(Point position, int speed, KeyHandler keyHandler, GamePanel gamePanel) throws IOException {
         super(position, speed);
+        this.keyHandler = keyHandler;
+        BufferedImage image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/playerSprites/player.png")));
+        Dimension playerSize = new Dimension(48, 48);
+        this.sprites =  new Sprite(image, playerSize.width, playerSize.height);
+        this.gamePanel = gamePanel;
         runningSpeed = speed *2;
         defaultSpeed = speed;
-        this.keyHandler = keyHandler;
-        this.sprites =  new Sprite(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/playerSprites/player.png"))), 48,48);
         startAnimPoints = new Point[]{new Point(2, 20), new Point(2, 2), new Point(2, 38), new Point(2, 56)};
+        hitBox = new Rectangle(position, new Dimension(playerSize.width, playerSize.height));
     }
 
     /**
@@ -45,29 +49,39 @@ public class Player extends Entity{
      * */
     @Override
     public void move(byte[] offsets){
-        if(offsets[4] == 1){
-            this.speed = runningSpeed;
-        }else this.speed = defaultSpeed;
 
-        int newPositionY = (int) (this.getPosition().getY()) + (offsets[0] + offsets[1]) * this.getSpeed();
-        int newPositionX = (int) (this.getPosition().getX()) + (offsets[2] + offsets[3]) * this.getSpeed();
+        int newPositionX = this.position.x + (offsets[2] + offsets[3]) * this.speed;
+        int newPositionY = this.position.y + (offsets[1] + offsets[0]) * this.speed;
 
         if(offsets[0] == -1) {
             direction = Direction.UP;
-        }else if(offsets[1] == 1) {
+        }if(offsets[1] == 1) {
             direction = Direction.DOWN;
-        }else if(offsets[2] == -1){
+        }if(offsets[2] == -1){
             direction = Direction.LEFT;
-        }else if(offsets[3] == 1){
+        }if(offsets[3] == 1){
             direction = Direction.RIGHT;
         }
 
-        if(newPositionX + sprites.getTileSizeW() < GamePanel.getScreenWidth() && newPositionX > 0){
-            this.getPosition().x += (offsets[2] + offsets[3]) * this.getSpeed();
+        if(newPositionX + this.hitBox.width < GamePanel.SCREEN_WIDTH && newPositionX > 0){
+            if(collisionDirection == Direction.RIGHT){
+                this.position.x += offsets[2] * this.getSpeed();
+            }else  if(collisionDirection == Direction.LEFT){
+                this.position.x += offsets[3] * this.getSpeed();
+            }else{
+                this.position.x += (offsets[2] + offsets[3]) * this.getSpeed();
+            }
         }
-       if(newPositionY + sprites.getTileSizeH() < GamePanel.getScreenHeight() && newPositionY > 0){
-           this.getPosition().y += (offsets[0] + offsets[1]) * this.getSpeed();
-        }
+       if(newPositionY + this.hitBox.height < GamePanel.SCREEN_HEIGHT && newPositionY > 0){
+           if(collisionDirection == Direction.UP){
+               this.position.y += offsets[1] * this.getSpeed();
+           }else  if(collisionDirection == Direction.DOWN){
+               this.position.y += offsets[0] * this.getSpeed();
+           }else{
+               this.position.y += (offsets[0] + offsets[1]) * this.getSpeed();
+           }
+       }
+       this.hitBox.setLocation(this.position.x, this.position.y);
        oldDirection = direction;
     }
 
@@ -89,7 +103,6 @@ public class Player extends Entity{
                     image = sprites.getSprites().getSubimage((startAnimPoints[2].x + (16 * animCount)) + (2 * animCount), startAnimPoints[2].y, 16, 16);
                 } else image = sprites.getSprites().getSubimage(startAnimPoints[2].x, startAnimPoints[2].y, 16, 16);
             }
-
             case RIGHT ->{
                 if(oldDirection == direction && keyHandler.getPlayerOffset()[3] == 1) {
                     image = sprites.getSprites().getSubimage((startAnimPoints[3].x + (16 * animCount)) + (2 * animCount), startAnimPoints[3].y, 16, 16);
@@ -109,11 +122,12 @@ public class Player extends Entity{
     public void update(){
         this.move(keyHandler.getPlayerOffset());
         this.chooseSprite();
+        collisionOn = false;
+        gamePanel.getCollisionManager().checkCollision(this);
     }
 
     public void draw(Graphics2D graphics2D){
 
-        graphics2D.drawImage(drawingSprite, position.x, position.y, sprites.getTileSizeW(),sprites.getTileSizeH(), null);
+        graphics2D.drawImage(drawingSprite, position.x, position.y, sprites.getSpriteW(),sprites.getSpriteH(), null);
     }
-
 }
