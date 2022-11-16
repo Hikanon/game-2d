@@ -1,4 +1,6 @@
-package com.main.game;
+package com.main.engine.mapProcessing;
+
+import lombok.Getter;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -9,17 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class GameMap {
+@Getter
+public class LocationMap {
 
     List<MapObject> mapObjects;
-
     Properties mapProperties;
 
-    public GameMap(Properties mapProperties) throws IOException {
+    public LocationMap(Properties mapProperties) throws IOException {
         this.mapProperties = mapProperties;
         mapObjects = new ArrayList<>();
         fillMapObjectsList();
-
     }
 
     private void fillMapObjectsList() throws IOException {
@@ -30,7 +31,14 @@ public class GameMap {
             BufferedImage sprite = ImageIO.read(fileInputStream);
             int positionX  = Integer.parseInt(mapProperties.getProperty("map.object" + (i+1) + ".position.x"));
             int positionY  = Integer.parseInt(mapProperties.getProperty("map.object" + (i+1) + ".position.y"));
-            MapObject object = new MapObject(sprite, mapProperties.getProperty("map.object" + (i + 1) + "spriteName"), new Point(positionX, positionY));
+            boolean collision = Boolean.parseBoolean(mapProperties.getProperty("map.object" + (i+1) + ".collision"));
+            int width = 0;
+            int height = 0;
+            if (collision){
+                width = Integer.parseInt(mapProperties.getProperty("map.object" + (i+1) + ".width"));
+                height = Integer.parseInt(mapProperties.getProperty("map.object" + (i+1) + ".height"));
+            }
+            MapObject object = new MapObject(sprite, fileName, new Point(positionX, positionY), collision, width, height);
             mapObjects.add(object);
         }
     }
@@ -40,6 +48,4 @@ public class GameMap {
             g2.drawImage(object.getImage(), object.getPosition().x, object.getPosition().y, null);
         }
     }
-
-
 }
