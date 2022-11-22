@@ -12,17 +12,17 @@ import java.awt.image.BufferedImage;
 @Setter
 public class Sprite {
 
-    BufferedImage sprites;
+    BufferedImage sprite;
     int spriteW;
     int spriteH;
 
-    public Sprite(BufferedImage sprites, int spriteW, int spriteH) {
-        this.sprites = sprites;
+    public Sprite(BufferedImage sprite, int spriteW, int spriteH) {
+        this.sprite = sprite;
         this.spriteW = spriteW;
         this.spriteH = spriteH;
     }
 
-    public BufferedImage getSprites() {
-        return sprites;
+    public BufferedImage getSprite() {
+        return sprite;
     }
 }

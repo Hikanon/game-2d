@@ -1,17 +1,13 @@
 package com.main.game.entity;
 
 import com.main.engine.KeyHandler;
-import com.main.engine.Sprite;
 import com.main.game.GamePanel;
 import com.main.engine.enums.Direction;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -21,23 +17,15 @@ public class Player extends Entity{
     private final Point[] startAnimPoints;
     private int animCount = 0;
     private int spriteCount = 0;
-    private final int runningSpeed;
-    private final int defaultSpeed;
     private final GamePanel gamePanel;
     private BufferedImage drawingSprite;
     private Direction oldDirection = Direction.DOWN;
 
     public Player(Point position, int speed, KeyHandler keyHandler, GamePanel gamePanel) throws IOException {
-        super(position, speed);
+        super(position, speed, new Dimension(48, 48), "/playerSprites/player.png");
         this.keyHandler = keyHandler;
-        BufferedImage image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/playerSprites/player.png")));
-        Dimension playerSize = new Dimension(48, 48);
-        this.sprites =  new Sprite(image, playerSize.width, playerSize.height);
         this.gamePanel = gamePanel;
-        runningSpeed = speed *2;
-        defaultSpeed = speed;
-        startAnimPoints = new Point[]{new Point(2, 20), new Point(2, 2), new Point(2, 38), new Point(2, 56)};
-        hitBox = new Rectangle(position, new Dimension(playerSize.width, playerSize.height));
+        this.startAnimPoints = new Point[]{new Point(2, 20), new Point(2, 2), new Point(2, 38), new Point(2, 56)};
     }
 
     /**
@@ -50,8 +38,8 @@ public class Player extends Entity{
     @Override
     public void move(byte[] offsets){
 
-        int newPositionX = this.position.x + (offsets[2] + offsets[3]) * this.speed;
-        int newPositionY = this.position.y + (offsets[1] + offsets[0]) * this.speed;
+        newPositionX = this.position.x + (offsets[2] + offsets[3]) * this.speed;
+        newPositionY = this.position.y + (offsets[1] + offsets[0]) * this.speed;
 
         if(offsets[0] == -1) {
             direction = Direction.UP;
@@ -66,7 +54,7 @@ public class Player extends Entity{
         if(newPositionX + this.hitBox.width < GamePanel.SCREEN_WIDTH && newPositionX > 0){
             if(collisionDirection == Direction.RIGHT){
                 this.position.x += offsets[2] * this.getSpeed();
-            }else  if(collisionDirection == Direction.LEFT){
+            }else if(collisionDirection == Direction.LEFT){
                 this.position.x += offsets[3] * this.getSpeed();
             }else{
                 this.position.x += (offsets[2] + offsets[3]) * this.getSpeed();
@@ -90,23 +78,23 @@ public class Player extends Entity{
         switch (direction) {
             case UP -> {
                 if(oldDirection == direction && keyHandler.getPlayerOffset()[0] == -1){
-                    image = sprites.getSprites().getSubimage((startAnimPoints[0].x + (16* animCount)) + (2 * animCount), startAnimPoints[0].y, 16, 16);
-                }else image = sprites.getSprites().getSubimage(startAnimPoints[0].x, startAnimPoints[0].y, 16, 16);
+                    image = sprite.getSprite().getSubimage((startAnimPoints[0].x + (16* animCount)) + (2 * animCount), startAnimPoints[0].y, 16, 16);
+                }else image = sprite.getSprite().getSubimage(startAnimPoints[0].x, startAnimPoints[0].y, 16, 16);
             }
             case DOWN -> {
                 if(oldDirection == direction && keyHandler.getPlayerOffset()[1] == 1){
-                    image = sprites.getSprites().getSubimage((startAnimPoints[1].x + (16 * animCount)) + (2 *animCount), startAnimPoints[1].y, 16, 16);
-                }else image = sprites.getSprites().getSubimage(startAnimPoints[1].x, startAnimPoints[1].y, 16, 16);
+                    image = sprite.getSprite().getSubimage((startAnimPoints[1].x + (16 * animCount)) + (2 *animCount), startAnimPoints[1].y, 16, 16);
+                }else image = sprite.getSprite().getSubimage(startAnimPoints[1].x, startAnimPoints[1].y, 16, 16);
             }
             case LEFT -> {
                 if (oldDirection == direction && keyHandler.getPlayerOffset()[2] == 1) {
-                    image = sprites.getSprites().getSubimage((startAnimPoints[2].x + (16 * animCount)) + (2 * animCount), startAnimPoints[2].y, 16, 16);
-                } else image = sprites.getSprites().getSubimage(startAnimPoints[2].x, startAnimPoints[2].y, 16, 16);
+                    image = sprite.getSprite().getSubimage((startAnimPoints[2].x + (16 * animCount)) + (2 * animCount), startAnimPoints[2].y, 16, 16);
+                } else image = sprite.getSprite().getSubimage(startAnimPoints[2].x, startAnimPoints[2].y, 16, 16);
             }
             case RIGHT ->{
                 if(oldDirection == direction && keyHandler.getPlayerOffset()[3] == 1) {
-                    image = sprites.getSprites().getSubimage((startAnimPoints[3].x + (16 * animCount)) + (2 * animCount), startAnimPoints[3].y, 16, 16);
-                }else image = sprites.getSprites().getSubimage(startAnimPoints[3].x, startAnimPoints[3].y, 16, 16);
+                    image = sprite.getSprite().getSubimage((startAnimPoints[3].x + (16 * animCount)) + (2 * animCount), startAnimPoints[3].y, 16, 16);
+                }else image = sprite.getSprite().getSubimage(startAnimPoints[3].x, startAnimPoints[3].y, 16, 16);
             }
         }
         spriteCount++;
@@ -122,12 +110,11 @@ public class Player extends Entity{
     public void update(){
         this.move(keyHandler.getPlayerOffset());
         this.chooseSprite();
-        collisionOn = false;
         gamePanel.getCollisionManager().checkCollision(this);
     }
 
     public void draw(Graphics2D graphics2D){
-
-        graphics2D.drawImage(drawingSprite, position.x, position.y, sprites.getSpriteW(),sprites.getSpriteH(), null);
+        graphics2D.drawImage(drawingSprite, position.x, position.y, sprite.getSpriteW(),sprite.getSpriteH(), null);
     }
+
 }
