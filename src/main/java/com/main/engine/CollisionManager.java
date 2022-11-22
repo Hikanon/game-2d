@@ -50,11 +50,23 @@ public class CollisionManager {
         }
     }
 
-    private Direction collisionDirection(Rectangle entity, Rectangle object){
-       if(entity.x + entity.width == object.x && entity.y < object.y + object.height && entity.y + entity.height > object.y ){
-           return Direction.RIGHT;
-       }
-       return null;
-    }
+    private Direction collisionDirection(Rectangle entityHitBox, Rectangle objectHitBox){
+        Point entityTopLeftPoint = entityHitBox.getLocation();
+        Point entityBottomLeftPoint = new Point((int) entityHitBox.getMinX(), (int) entityHitBox.getMaxY());
+        Point entityTopRightPoint = new Point((int) entityHitBox.getMaxX(), (int) entityHitBox.getMinY());
 
+        if(objectHitBox.intersects(new Rectangle(entityTopLeftPoint.x + 2, entityTopLeftPoint.y, entityHitBox.width-4, 1))){
+            return Direction.UP;
+        }
+        if(objectHitBox.intersects(new Rectangle(entityBottomLeftPoint.x + 2, entityBottomLeftPoint.y, entityHitBox.width-4, 1))){
+            return Direction.DOWN;
+        }
+        if(objectHitBox.intersects(new Rectangle(entityTopRightPoint.x, entityTopRightPoint.y + 2, 1, entityHitBox.height - 4))){
+            return Direction.RIGHT;
+        }
+        if(objectHitBox.intersects(new Rectangle(entityTopLeftPoint.x, entityTopLeftPoint.y + 2, 1, entityHitBox.height - 4))){
+            return Direction.LEFT;
+        }
+        return null;
+    }
 }
