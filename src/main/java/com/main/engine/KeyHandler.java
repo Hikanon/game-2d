@@ -7,14 +7,15 @@ import java.util.Set;
 
 import static java.awt.event.KeyEvent.*;
 
-public class KeyHandler implements KeyListener{
+public class KeyHandler implements KeyListener {
 
     private final Set<Integer> pressedKeys = new HashSet<>();
 
     byte[] playerOffset = new byte[5];
 
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+    }
 
     @Override
     public synchronized void keyPressed(KeyEvent e) {

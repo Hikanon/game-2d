@@ -1,6 +1,7 @@
 package com.main;
 
 import com.main.game.GameFrame;
+
 import java.io.IOException;
 
 public class Main {

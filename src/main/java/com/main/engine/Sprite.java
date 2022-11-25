@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * Размер спрайта = хитбокс
- * */
+ */
 @Getter
 @Setter
 public class Sprite {

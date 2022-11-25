@@ -1,6 +1,7 @@
 package com.main.engine.mapProcessing;
 
 import lombok.Getter;
+
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-/** Класс для обработки и отображения локации
+/**
+ * Класс для обработки и отображения локации
+ *
  * @author Hikanon
  * @since 1.0
  */
@@ -33,11 +36,11 @@ public class MapManager {
         //TODO создать конфиг файл и оттуда вытаскивать данные о картах
     }
 
-    public final void draw(Graphics2D g2){
+    public final void draw(Graphics2D g2) {
         maps.get(activeMap).drawMap(g2);
     }
 
-    public final LocationMap getUsedMap(){
+    public final LocationMap getUsedMap() {
         return maps.get(activeMap);
     }
 }
